@@ -87,7 +87,7 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
   const items = xml.getElementsByTagName('item');
   let limitLength;
   if (limit) {
-    limitLength = limit;
+    limitLength = limiteArticles.value;
   } else {
     limitLength = items.length;
   }
@@ -171,7 +171,7 @@ window.scrollTo({
       v-if="article.img"
       :src="article.img"
       class="pixelated-image  w-11/12 max-h-72 rounded-lg object-cover"
-    >        <img v-else src="~/assets/img/ee.png" class="hidden w-11/12 max-h-72 rounded-lg object-cover md:block">
+    >        <img v-else src="~/assets/img/ee.png" class=" w-11/12 max-h-72 rounded-lg object-cover ">
         <div class="flex flex-col justify-between w-full	 gap-y-4">
           <div class="space-y-4">
             <div class="flex justify-center">
