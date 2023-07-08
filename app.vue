@@ -174,7 +174,7 @@ window.scrollTo({
         <div class="flex flex-col justify-between w-full	 gap-y-4">
           <div class="space-y-4">
             <div class="flex justify-center">
-              <p class="line-clamp-1 text-lg  max-w-fit	text-white text-center	font-bold">
+              <p class="line-clamp-2 md:line-clamp-1 text-lg  max-w-fit	text-white text-center	font-bold">
                 {{ article.title }}
               </p>
             </div>
