@@ -91,7 +91,7 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
   } else {
     limitLength = items.length;
   }
-  for (let i = 0; i < limitLength; i += 1) {
+  for (let i = 0; i < limiteArticles; i += 1) {
     const title = items[i]?.querySelector('title')?.textContent;
     const link = items[i]?.querySelector('link')?.textContent;
     
