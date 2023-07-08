@@ -46,14 +46,13 @@ let tableau = [
 
 onMounted(async () => {
   try {
-
-
     await FeedArticles(tableau);
-    
+    showFeed.value = false;
   } catch (erreur) {
     console.error('Une erreur s\'est produite (API) :', erreur);
   }
 });
+
 
 async function FeedArticles(fluxRssList) {
   articles.value = [];
@@ -87,7 +86,7 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
   const items = xml.getElementsByTagName('item');
   let limitLength;
   if (limit) {
-    limitLength = limiteArticles ;
+    limitLength = limiteArticles.value ;
   } else {
     limitLength = items.length;
   }
@@ -134,7 +133,6 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
     articles.value.push(article);
     articles.value.sort(sortChrono);
   }
-  showFeed.value = false;
 
 }
 
