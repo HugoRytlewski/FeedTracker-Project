@@ -133,8 +133,9 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
     };
     articles.value.push(article);
     articles.value.sort(sortChrono);
-    showFeed.value = false;
   }
+  showFeed.value = false;
+
 }
 
 async function isImageValid(url) {
