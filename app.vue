@@ -87,7 +87,7 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
   const items = xml.getElementsByTagName('item');
   let limitLength;
   if (limit) {
-    limitLength = limiteArticles.value;
+    limitLength = limiteArticles;
   } else {
     limitLength = items.length;
   }
