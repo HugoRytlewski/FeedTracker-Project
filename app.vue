@@ -66,7 +66,7 @@ async function FeedArticles(fluxRssList) {
     try {
       const reponse = await axios.get(proxyUrl + url);
       const donnees = reponse.data;
-      setRssFeed(donnees, false);
+      setRssFeed(donnees, true);
     } catch (erreur) {
       console.error(`Une erreur s'est produite lors de la récupération du flux RSS : ${erreur}`);
     }
@@ -91,7 +91,7 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
   } else {
     limitLength = items.length;
   }
-  for (let i = 0; i < limiteArticles; i += 1) {
+  for (let i = 0; i < limitLength; i += 1) {
     const title = items[i]?.querySelector('title')?.textContent;
     const link = items[i]?.querySelector('link')?.textContent;
     
@@ -160,7 +160,8 @@ window.scrollTo({
 }
 </script>
 <template>
-    <Wait v-if="showFeed"/>
+    <Wait v-if="showFeed"
+/>
 
   <Navbar/>
   <div class="p-10 mt-24 lg:p-28 lg:mt-16">
