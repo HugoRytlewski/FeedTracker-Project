@@ -130,6 +130,7 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
     };
     articles.value.push(article);
     articles.value.sort(sortChrono);
+    showFeed.value = true;
   }
 }
 
@@ -154,12 +155,12 @@ window.scrollTo({
     behavior: "smooth"
 })
 }
-
+const showFeed = ref(false)
 </script>
 
 <template>
   <Navbar/>
-  <div class="p-10 mt-24 lg:p-28 lg:mt-16">
+  <div v-if="showFeed" class="p-10 mt-24 lg:p-28 lg:mt-16">
     <div class="grid lg:grid-cols-2 gap-16 ">
       <div v-for="(article , index) in articles.slice(0, limiteArticles)" :key="index" class="flex h-full items-center justify-center flex-col gap-6 rounded-xl bg-neutral-800 hover:-translate-y-1 hover:scale-105  duration-200 p-6  border-neutral-800 shadow-md ">
         <img
