@@ -5,7 +5,10 @@ import axios from 'axios';
 import { ref, onMounted } from 'vue';
 import Navbar from '/components/Layouts/NavBar.vue';
 import Footer from '/components/Layouts/Footer.vue';
+import Wait from '/components/Layouts/Wait.vue';
+
 import cheerio from 'cheerio';
+const showFeed = ref(true)
 
 import { useWindowScroll } from "@vueuse/core";
 const { y } = useWindowScroll();
@@ -130,7 +133,7 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
     };
     articles.value.push(article);
     articles.value.sort(sortChrono);
-    showFeed.value = true;
+    showFeed.value = false;
   }
 }
 
@@ -155,7 +158,6 @@ window.scrollTo({
     behavior: "smooth"
 })
 }
-const showFeed = ref(false)
 </script>
 
 <template>
