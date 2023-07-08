@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    /* SideBar */
+    .sidebar-items {
+        @apply py-2;
+    }
+
+    .sidebar-button {
+        @apply flex items-center justify-center w-full py-2 text-black transition rounded hover:bg-gray-100;
+    }
+
+    .sidebar-button-open {
+        @apply lg:justify-between;
+    }
+
+    .sidebar-button-close {
+        @apply lg:justify-center;
+    }
+
+    .box-items {
+        @apply flex items-center gap-x-2.5;
+    }
+
+    .icon-items {
+        @apply w-6 h-6 text-blue-500;
+    }
+
+    .text-items {
+        @apply hidden lg:block;
+    }
+
+    .arrow-items {
+        @apply hidden text-black lg:block;
+    }
+
+    .dropdown-content {
+        padding: 16px 30px;
+    }   
+
+    .checkbox-description {
+        margin-left: 10px;
+    }
+
+        
+}
