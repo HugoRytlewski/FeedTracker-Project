@@ -23,18 +23,18 @@ let tableau = [
   },
   {
     "id": 2,
-    "url": "https://www.tomsguide.fr/feed/\n",
+    "url": "https://www.tomsguide.fr/feed/",
   },
   {
 
     "id": 3,
-    "url": "https://www.zdnet.fr/feeds/rss/actualites/\n",
+    "url": "https://www.zdnet.fr/feeds/rss/actualites/",
  
   },
   {
 
     "id": 4,
-    "url": "https://www.01net.com/actualites/feed/\n",
+    "url": "https://www.01net.com/actualites/feed/",
   },
   {
     "id": 5,
@@ -66,7 +66,7 @@ async function FeedArticles(fluxRssList) {
     try {
       const reponse = await axios.get(proxyUrl + url);
       const donnees = reponse.data;
-      setRssFeed(donnees, true);
+      setRssFeed(donnees, false);
     } catch (erreur) {
       console.error(`Une erreur s'est produite lors de la récupération du flux RSS : ${erreur}`);
     }
