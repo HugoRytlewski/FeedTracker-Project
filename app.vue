@@ -68,7 +68,7 @@ async function FeedArticles(fluxRssList) {
     try {
       const reponse = await axios.get(proxyUrl + url);
       const donnees = reponse.data;
-      setRssFeed(donnees, false);
+      setRssFeed(donnees, true);
     } catch (erreur) {
       console.error(`Une erreur s'est produite lors de la récupération du flux RSS : ${erreur}`);
     }
