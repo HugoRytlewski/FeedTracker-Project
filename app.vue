@@ -41,7 +41,7 @@ let tableau = [
   {
     "id": 5,
     "url": "https://www.journaldunet.com/rss/",
-  }
+  },
   {
     "id": 6,
     "url": "https://www.frandroid.com/feed",
