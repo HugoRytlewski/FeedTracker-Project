@@ -10,7 +10,6 @@ import { useWindowScroll } from "@vueuse/core";
 
 
 const articles = ref([]);
-const limitArticles = ref(10);
 const limiteArticles = ref(10);
 const { y } = useWindowScroll();
 const waitLoadRss = ref(true)
@@ -91,7 +90,7 @@ function extractImageSource(contentEncoded) {
   }
 }
 async function setRssFeed(dataFeed:any, limit:boolean) {
-  limitArticles.value = 10 ;
+  limiteArticles.value = 10 ;
 
   const parser = new DOMParser();
   const xml = parser.parseFromString(dataFeed, 'text/xml');
@@ -168,7 +167,7 @@ async function isImageValid(url) {
   });
 }
 
-function incrementLimitArticles() {
+function incrementlimiteArticles() {
   limiteArticles.value += 10;
 }
 
@@ -186,9 +185,6 @@ window.scrollTo({
 <template>
     <Wait class="hidden md:grid		"  v-if="waitLoadRss"/>
     <Navbar/>
-    <div :class="[limitArticles < articles.length ? 'pb-px' : '','p-6']">
-
-
   <div class="p-10 mt-24 lg:p-28 lg:mt-16">
     <div class="grid lg:grid-cols-2 gap-16 ">
       <div v-for="(article , index) in articles.slice(0, limiteArticles)" :key="index" class="flex h-full items-center justify-center flex-col gap-6 rounded-xl bg-neutral-800 hover:-translate-y-1 hover:scale-105  duration-200 p-6  border-neutral-800 shadow-md ">
@@ -214,7 +210,7 @@ window.scrollTo({
       </div>
     </div>
     <div class="flex items-center justify-center mt-16">
-      <button v-if="limiteArticles < articles.length" @click="incrementLimitArticles" class="relative rounded px-5 py-2.5 text-black overflow-hidden group bg-white hover:bg-neutral-400  ">
+      <button v-if="limiteArticles < articles.length" @click="incrementlimiteArticles" class="relative rounded px-5 py-2.5 text-black overflow-hidden group bg-white hover:bg-neutral-400  ">
         <span class="absolute right-0 w-8 h-32 -mt-12 "></span>
         <span class="relative">Voir plus</span>
       </button>
@@ -228,7 +224,6 @@ window.scrollTo({
     </button>
   </Transition>
   <Footer/>
-</div>
 
 </template>
 
