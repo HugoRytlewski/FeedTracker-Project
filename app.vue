@@ -57,7 +57,6 @@ async function FeedArticles(fluxRssList) {
 
   for (const fluxRss of fluxRssList) {
     const url = fluxRss.url;
-
     try {
       const reponse = await axios.get(proxyUrl + url);
       const donnees = reponse.data;
@@ -96,7 +95,7 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
   const items = xml.getElementsByTagName('item');
   let limitLength ;
   if (limit) {
-    limitLength = limit;
+    limitLength = 10;
   } else {
     limitLength = items.length;
   }
