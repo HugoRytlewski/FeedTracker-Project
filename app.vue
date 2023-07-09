@@ -61,7 +61,6 @@ async function FeedArticles(fluxRssList) {
       const reponse = await axios.get(proxyUrl + url);
       const donnees = reponse.data;
       setRssFeed(donnees, true);
-      console.log(donnees);
 
     } catch (erreur) {
       console.error(`Une erreur s'est produite lors de la récupération du flux RSS : ${erreur}`);
@@ -95,7 +94,7 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
   const items = xml.getElementsByTagName('item');
   let limitLength ;
   if (limit) {
-    limitLength = 10;
+    limitLength = 15;
   } else {
     limitLength = items.length;
   }
