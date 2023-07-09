@@ -47,12 +47,7 @@ let tableau = [
 ];
 
 onMounted(async () => {
-  try {
-    await FeedArticles(tableau);
-    
-  } catch (erreur) {
-    console.error('Une erreur s\'est produite  :', erreur);
-  }
+     FeedArticles(tableau);
 });
 
 async function FeedArticles(fluxRssList) {
