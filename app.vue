@@ -76,8 +76,9 @@ function extractImageSource(contentEncoded:any) {
   const xml = parser.parseFromString(dataFeed, 'text/xml');
   const items = xml.getElementsByTagName('item');
   let limitLength;
+  
   if (limit) {
-    limitLength = limiteArticles.value ;
+    limitLength = limit;
   } else {
     limitLength = items.length;
   }
