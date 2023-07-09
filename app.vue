@@ -15,8 +15,31 @@ const { y } = useWindowScroll();
 const waitLoadRss = ref(true)
 
 //Pour eviter d'utiliser un serveur back(php) j'ai pas les sous (reconstitution API)
+
 let tableau = [
-  
+{
+    "id": 1,
+    "url": "https://www.clubic.com/feed/news.rss\n"
+  },
+  {
+    "id": 2,
+    "url": "https://www.tomsguide.fr/feed/\n",
+  },
+  {
+
+    "id": 3,
+    "url": "https://www.zdnet.fr/feeds/rss/actualites/\n",
+ 
+  },
+  {
+
+    "id": 4,
+    "url": "https://www.01net.com/actualites/feed/\n",
+  },
+  {
+    "id": 5,
+    "url": "https://www.journaldunet.com/rss/",
+  },
   {
     "id": 6,
     "url": "https://www.frandroid.com/feed",
