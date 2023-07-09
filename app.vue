@@ -42,6 +42,10 @@ let tableau = [
     "id": 5,
     "url": "https://www.journaldunet.com/rss/",
   }
+  {
+    "id": 6,
+    "url": "https://www.frandroid.com/feed",
+  }
 ];
 
 onMounted(async () => {
@@ -80,7 +84,7 @@ function sortChrono(a:any, b:any) {
         }
     }
 
-async function setRssFeed(dataFeed:any, limit:boolean) {
+    async function setRssFeed(dataFeed:any, limit:boolean) {
   const parser = new DOMParser();
   const xml = parser.parseFromString(dataFeed, 'text/xml');
   const items = xml.getElementsByTagName('item');
@@ -100,6 +104,7 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
 
 
     let img = '';
+
     const mediaContent = items[i]?.querySelector('media\\:content, content');
     const mediaThumbnail = items[i]?.querySelector('media\\:thumbnail, thumbnail');
 
@@ -121,8 +126,18 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
     // Vérification de la validité de l'image
     const isImgValid = await isImageValid(img);
     if (!isImgValid) {
-      img = '';
+      const contentEncoded = items[i]?.getElementsByTagNameNS('*', 'encoded')[0]?.textContent;
+      const imgSrc = extractImageSource(contentEncoded);
+      const srcValid = isImageValid(imgSrc)
+      img = imgSrc;
+      if(!imgSrc){
+        img=''
+
+
+      }
+
     }
+    
 
     const article = {
       title,
@@ -133,7 +148,6 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
     articles.value.push(article);
     articles.value.sort(sortChrono);
   }
-
 }
 
 async function isImageValid(url) {
