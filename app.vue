@@ -214,7 +214,7 @@ window.scrollTo({
     </div>
   </div>
   <Transition>
-    <button v-if="y>100" @click="ScrollTop()" class="text-black bg-white fixed bottom-0 right-0 p-3 hover:animate-pulse	 mr-4 mb-4 rounded-full">
+    <button v-if="y>100" @click="ScrollTop()" class="text-black bg-white fixed bottom-0 right-0 p-3 mr-4 mb-4 rounded-full">
       <svg class="w-4 h-4 text-white-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
       </svg>
