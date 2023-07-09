@@ -62,6 +62,15 @@ function sortChrono(a:any, b:any) {
         }
     }
 
+function extractImageSource(contentEncoded:any) {
+  const regex = /<img.*?src="(.*?)"/;
+  const match = regex.exec(contentEncoded);
+  if (match && match[1]) {
+    return match[1];
+  } else {
+    return '';
+  }
+}
     async function setRssFeed(dataFeed:any, limit:boolean) {
   const parser = new DOMParser();
   const xml = parser.parseFromString(dataFeed, 'text/xml');
