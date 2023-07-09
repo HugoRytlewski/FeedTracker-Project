@@ -1,21 +1,18 @@
 <script setup lang="ts">
-
-
 import axios from 'axios';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import Navbar from '/components/Layouts/NavBar.vue';
 import Footer from '/components/Layouts/Footer.vue';
 import Wait from '/components/Layouts/Wait.vue';
 
 import cheerio from 'cheerio';
-const showFeed = ref(true)
-
 import { useWindowScroll } from "@vueuse/core";
-const { y } = useWindowScroll();
 
 
 const articles = ref([]);
 const limiteArticles = ref(10);
+const { y } = useWindowScroll();
+const waitLoadRss = ref(true)
 
 //Pour eviter d'utiliser un serveur back(php) j'ai pas les sous (reconstitution API)
 let tableau = [
@@ -28,13 +25,14 @@ let tableau = [
 
 onMounted(async () => {
   try {
+
+
     await FeedArticles(tableau);
-    showFeed.value = false;
+    
   } catch (erreur) {
-    console.error('Une erreur s\'est produite (API) :', erreur);
+    console.error('Une erreur s\'est produite  :', erreur);
   }
 });
-
 
 async function FeedArticles(fluxRssList) {
   articles.value = [];
@@ -47,7 +45,7 @@ async function FeedArticles(fluxRssList) {
     try {
       const reponse = await axios.get(proxyUrl + url);
       const donnees = reponse.data;
-      setRssFeed(donnees, true);
+      setRssFeed(donnees, false);
     } catch (erreur) {
       console.error(`Une erreur s'est produite lors de la récupération du flux RSS : ${erreur}`);
     }
@@ -61,8 +59,7 @@ function sortChrono(a:any, b:any) {
             return -1; 
         }
     }
-
-function extractImageSource(contentEncoded:any) {
+function extractImageSource(contentEncoded) {
   const regex = /<img.*?src="(.*?)"/;
   const match = regex.exec(contentEncoded);
   if (match && match[1]) {
@@ -124,6 +121,7 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
       }
 
     }
+    
 
     const article = {
       title,
@@ -134,6 +132,7 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
     articles.value.push(article);
     articles.value.sort(sortChrono);
   }
+  waitLoadRss.value = false;
 }
 
 async function isImageValid(url) {
@@ -157,24 +156,21 @@ window.scrollTo({
     behavior: "smooth"
 })
 }
-</script>
-<template>
-    <Wait v-if="showFeed"
-/>
 
-  <Navbar/>
+</script>
+
+<template>
+    <Wait class="hidden md:grid		"  v-if="waitLoadRss"/>
+    <Navbar/>
   <div class="p-10 mt-24 lg:p-28 lg:mt-16">
     <div class="grid lg:grid-cols-2 gap-16 ">
       <div v-for="(article , index) in articles.slice(0, limiteArticles)" :key="index" class="flex h-full items-center justify-center flex-col gap-6 rounded-xl bg-neutral-800 hover:-translate-y-1 hover:scale-105  duration-200 p-6  border-neutral-800 shadow-md ">
-        <img
-      v-if="article.img"
-      :src="article.img"
-      class="pixelated-image  w-11/12 max-h-72 rounded-lg object-cover"
-    >        <img v-else src="~/assets/img/ee.png" class=" w-11/12 max-h-72 rounded-lg object-cover ">
+        <img  v-if="article.img" :src="article.img" class="pixelated-image  w-11/12 max-h-72 rounded-lg object-cover  lazyload">
+        <img v-else src="~/assets/img/ee.png" class=" w-11/12 max-h-72 rounded-lg object-cover ">
         <div class="flex flex-col justify-between w-full	 gap-y-4">
           <div class="space-y-4">
             <div class="flex justify-center">
-              <p class="line-clamp-2 md:line-clamp-1 text-lg  max-w-fit	text-white text-center	font-bold">
+              <p class="line-clamp-1 text-lg  max-w-fit	text-white text-center	font-bold">
                 {{ article.title }}
               </p>
             </div>
@@ -205,6 +201,7 @@ window.scrollTo({
     </button>
   </Transition>
   <Footer/>
+  
 </template>
 
 <style>
