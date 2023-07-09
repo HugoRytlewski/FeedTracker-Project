@@ -71,12 +71,11 @@ function extractImageSource(contentEncoded:any) {
     return '';
   }
 }
-    async function setRssFeed(dataFeed:any, limit:boolean) {
+async function setRssFeed(dataFeed:any, limit:boolean) {
   const parser = new DOMParser();
   const xml = parser.parseFromString(dataFeed, 'text/xml');
   const items = xml.getElementsByTagName('item');
   let limitLength;
-  
   if (limit) {
     limitLength = limit;
   } else {
@@ -125,7 +124,6 @@ function extractImageSource(contentEncoded:any) {
       }
 
     }
-    
 
     const article = {
       title,
