@@ -207,7 +207,7 @@ window.scrollTo({
       </div>
     </div>
     <div class="flex items-center justify-center mt-16">
-      <button v-if="limiteArticles < articles.length" @click="incrementlimiteArticles" class="relative rounded px-5 py-2.5 text-black overflow-hidden group bg-white hover:bg-neutral-400  ">
+      <button v-if="limiteArticles < articles.length" @click="incrementlimiteArticles" class="relative rounded px-5 py-2.5 text-black overflow-hidden group bg-white md:hover:bg-neutral-400  ">
         <span class="absolute right-0 w-8 h-32 -mt-12 "></span>
         <span class="relative">Voir plus</span>
       </button>
