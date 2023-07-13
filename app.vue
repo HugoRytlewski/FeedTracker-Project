@@ -184,7 +184,7 @@ window.scrollTo({
     <Navbar/>
   <div class="p-10 mt-24 lg:p-28 lg:mt-16">
     <div class="grid lg:grid-cols-2 gap-16 ">
-      <div v-for="(article , index) in articles.slice(0, limiteArticles)" :key="index" class="flex h-full items-center justify-center flex-col gap-6 rounded-xl bg-neutral-800 hover:-translate-y-1 hover:scale-105  duration-200 p-6  border-neutral-800 shadow-md ">
+      <div v-for="(article , index) in articles.slice(0, limiteArticles)" :key="index" class="flex h-full items-center justify-center flex-col gap-6 rounded-xl bg-neutral-800 md:hover:-translate-y-1 md:hover:scale-105  md:duration-200 p-6  border-neutral-800 shadow-md ">
         <img  v-if="article.img" :src="article.img" class="pixelated-image  w-11/12 max-h-72 rounded-lg object-cover  lazyload">
         <img v-else src="~/assets/img/ee.png" class=" w-11/12 max-h-72 rounded-lg object-cover ">
         <div class="flex flex-col justify-between w-full	 gap-y-4">
