@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup >
 import axios from 'axios';
 import { ref, onMounted, computed } from 'vue';
 import Navbar from '/components/Layouts/NavBar.vue';
@@ -17,7 +17,7 @@ const waitLoadRss = ref(true)
 //Pour eviter d'utiliser un serveur back(php) j'ai pas les sous (reconstitution API)
 
 let tableau = [
-{
+  {
     "id": 1,
     "url": "https://www.clubic.com/feed/news.rss\n"
   },
@@ -26,13 +26,10 @@ let tableau = [
     "url": "https://www.tomsguide.fr/feed/",
   },
   {
-
     "id": 3,
     "url": "https://www.zdnet.fr/feeds/rss/actualites/",
- 
   },
   {
-
     "id": 4,
     "url": "https://www.01net.com/actualites/feed/",
   },
@@ -70,7 +67,7 @@ async function FeedArticles(fluxRssList) {
   
 }
 
-function sortChrono(a:any, b:any) {
+function sortChrono(a, b) {
         const dateA = new Date(a.pubDate);
         const dateB = new Date(b.pubDate);
         if (dateA > dateB) {
@@ -86,7 +83,7 @@ function extractImageSource(contentEncoded) {
     return '';
   }
 }
-async function setRssFeed(dataFeed:any, limit:boolean) {
+async function setRssFeed(dataFeed, limit) {
   limiteArticles.value = 10 ;
 
   const parser = new DOMParser();
@@ -132,7 +129,6 @@ async function setRssFeed(dataFeed:any, limit:boolean) {
     if (!isImgValid) {
       const contentEncoded = items[i]?.getElementsByTagNameNS('*', 'encoded')[0]?.textContent;
       const imgSrc = extractImageSource(contentEncoded);
-      const srcValid = isImageValid(imgSrc)
       img = imgSrc;
       if(!imgSrc){
         img=''
