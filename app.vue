@@ -222,6 +222,9 @@ window.scrollTo({
 </template>
 
 <style>
+html {
+	scroll-behavior: smooth;
+}
 body {
   background-color: rgb(27, 27, 27);
 }
