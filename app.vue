@@ -178,7 +178,8 @@ window.scrollTo({
 <template>
     <Wait class="hidden md:grid		"  v-if="waitLoadRss"/>
     <Navbar/>
-  <div class="p-10 mt-24 lg:p-28 lg:mt-16">
+  <div class="p-10 mt-24 lg:p-28 lg:mt-16"     id="accueil"
+>
     <div class="grid lg:grid-cols-2 gap-16 ">
       <div v-for="(article , index) in articles.slice(0, limiteArticles)" :key="index" class="flex h-full items-center justify-center flex-col gap-6 rounded-xl bg-neutral-800 md:hover:-translate-y-1 md:hover:scale-105  md:duration-200 p-6  border-neutral-800 shadow-md ">
         <img  v-if="article.img" :src="article.img" class="pixelated-image  w-11/12 max-h-72 rounded-lg object-cover  lazyload">

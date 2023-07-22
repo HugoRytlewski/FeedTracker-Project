@@ -1,9 +1,11 @@
 <template>
 <ul class="fixed w-screen block flex justify-center bg-neutral-900  text-white z-40 text text-lg top-0 item-center drop-shadown-2xl p-7">
     <li>
+      <NuxtLink to="#accueil">
       <p class="text-3xl font-extrabold text-white">
         FeedTracker
       </p>
+    </NuxtLink>
     </li>
   </ul>
 </template>
