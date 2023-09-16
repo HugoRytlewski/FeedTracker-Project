@@ -1,14 +1,4 @@
 
-<script>
-function ScrollTop() {
-
-window.scrollTo({
-    top: 0,
-    left: 0,
-    behavior: "smooth"
-})
-}
-</script>
 <template>
 <ul class="fixed w-screen block flex justify-center bg-neutral-900  text-white z-40 text text-lg top-0 item-center drop-shadown-2xl p-7">
     <li>

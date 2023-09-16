@@ -19,28 +19,37 @@ const waitLoadRss = ref(true)
 let tableau = [
   {
     "id": 1,
-    "url": "https://www.clubic.com/feed/news.rss\n"
+    "url": "https://www.zdnet.fr/blogs/cybervigilance/rss/",
   },
   {
     "id": 2,
-    "url": "https://www.tomsguide.fr/feed/",
+    "url":"https://www.zdnet.fr/blogs/developpeur-zone/rss",
   },
   {
     "id": 3,
-    "url": "https://www.zdnet.fr/feeds/rss/actualites/",
+    "url":"https://threatpost.com/feed/",
   },
   {
     "id": 4,
-    "url": "https://www.01net.com/actualites/feed/",
+    "url":"https://krebsonsecurity.com/feed/",
   },
   {
     "id": 5,
-    "url": "https://www.journaldunet.com/rss/",
+    "url":"https://www.smashingmagazine.com/feed/",
   },
   {
     "id": 6,
-    "url": "https://www.frandroid.com/feed",
+    "url":"https://www.alsacreations.com/rss/actualites.xml",
+  },
+  {
+    "id": 7,
+    "url":"https://www.sitepoint.com/sitepoint.rss",
+  },
+  {
+    "id": 8,
+    "url":"https://www.sitepoint.com/sitepoint.rss",
   }
+  
 ];
 
 onMounted(async () => {
@@ -180,6 +189,7 @@ window.scrollTo({
     <Navbar/>
   <div class="p-10 mt-24 lg:p-28 lg:mt-16"     id="accueil"
 >
+
     <div class="grid lg:grid-cols-2 gap-16 ">
       <div v-for="(article , index) in articles.slice(0, limiteArticles)" :key="index" class="flex h-full items-center justify-center flex-col gap-6 rounded-xl bg-neutral-800 md:hover:-translate-y-1 md:hover:scale-105  md:duration-200 p-6  border-neutral-800 shadow-md ">
         <img  v-if="article.img" :src="article.img" class="pixelated-image  w-11/12 max-h-72 rounded-lg object-cover  lazyload">
