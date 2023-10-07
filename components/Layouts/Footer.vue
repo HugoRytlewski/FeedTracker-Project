@@ -7,7 +7,7 @@
         >© 2023
         <a class=""
           >FeedTracker,
-          <a href="hugorytlewski.com" target="_blank" class="hover:underline"
+          <a href="https://hugorytlewski.com" target="_blank" class="hover:underline"
             >Hugo Rytlewski</a
           >
           Tous droits réservés</a
