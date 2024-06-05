@@ -18,14 +18,6 @@ const waitLoadRss = ref(true)
 
 let tableau = [
   {
-    "id": 1,
-    "url": "https://www.zdnet.fr/blogs/cybervigilance/rss/",
-  },
-  {
-    "id": 2,
-    "url":"https://www.zdnet.fr/blogs/developpeur-zone/rss",
-  },
-  {
     "id": 3,
     "url":"https://threatpost.com/feed/",
   },
@@ -37,17 +29,18 @@ let tableau = [
     "id": 5,
     "url":"https://www.smashingmagazine.com/feed/",
   },
+
   {
     "id": 6,
-    "url":"https://www.alsacreations.com/rss/actualites.xml",
+    "url":"https://cyberveille.curated.co/issues.rss",
   },
   {
     "id": 7,
-    "url":"https://www.sitepoint.com/sitepoint.rss",
+    "url":"https://www.rfi.fr/fr/tag/cybercriminalité/rss",
   },
   {
     "id": 8,
-    "url":"https://www.sitepoint.com/sitepoint.rss",
+    "url":"https://www.lemonde.fr/piratage/rss_full.xml",
   }
   
 ];
@@ -76,13 +69,7 @@ async function FeedArticles(fluxRssList) {
   
 }
 
-function sortChrono(a, b) {
-        const dateA = new Date(a.pubDate);
-        const dateB = new Date(b.pubDate);
-        if (dateA > dateB) {
-            return -1; 
-        }
-    }
+
 function extractImageSource(contentEncoded) {
   const regex = /<img.*?src="(.*?)"/;
   const match = regex.exec(contentEncoded);
@@ -107,7 +94,8 @@ async function setRssFeed(dataFeed, limit) {
   for (let i = 0; i < limitLength; i += 1) {
     const title = items[i]?.querySelector('title')?.textContent;
     const link = items[i]?.querySelector('link')?.textContent;
-    
+    const pubDate = items[i].querySelector("pubDate")?.textContent;
+    console.log(pubDate);
     const descriptionHTML = items[i]?.querySelector('description')?.textContent;
     const $ = cheerio.load(descriptionHTML);
     const description = $.text();
@@ -153,9 +141,10 @@ async function setRssFeed(dataFeed, limit) {
       link,
       description,
       img,
+      pubDate
     };
     articles.value.push(article);
-    articles.value.sort(sortChrono);
+    articles.value.sort(comparerArticles);
   }
   waitLoadRss.value = false;
 }
@@ -181,6 +170,15 @@ window.scrollTo({
     behavior: "smooth"
 })
 }
+
+function comparerArticles(a, b) {
+        const dateA = new Date(a.pubDate);
+        const dateB = new Date(b.pubDate);
+        if (dateA > dateB) {
+            return -1; 
+        }
+    }
+
 
 </script>
 
