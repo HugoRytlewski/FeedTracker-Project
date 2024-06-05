@@ -9,6 +9,32 @@ import cheerio from 'cheerio';
 import { useWindowScroll } from "@vueuse/core";
 
 
+useHead({
+  title: 'FeedTracker -  Hugo Rytlewski',
+  meta: [
+    { charset: 'utf-8' },
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    { hid: 'description', name: 'description', content: "FeedTracker Veille Info" },
+    // Ajoutez d'autres balises meta ici
+    { name: 'keywords', content: 'portfolio étudiant, Hugo Rytlewski, développement web, projets de programmation, conception de sites, optimisation SEO, apprentissage en ligne, compétences techniques, HTML, CSS, JavaScript, réalisations académiques, création de sites web, UX/UI, sites responsives, projets interactifs, référencement en ligne, balises meta, stratégies SEO, intégration web, développement frontend, développement backend , veille , info, informatique, cyber, cybersecurite, feedTracker,tracker,feed tracker' },
+    // Autres balises meta
+  ],
+  link: [
+    { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+    // Autres balises link
+  ],
+  // Balises OpenGraph
+  meta: [
+    { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: 'https://feed-beryl.vercel.app' },
+    { property: 'og:title', content: 'FeedTracker -  Hugo Rytlewski' },
+    { property: 'og:description', content: 'FeedTracker Veille Info' }
+    // Autres balises OpenGraph
+  ],
+  // Autres balises head
+})
+
+
 const articles = ref([]);
 const limiteArticles = ref(10);
 const { y } = useWindowScroll();
