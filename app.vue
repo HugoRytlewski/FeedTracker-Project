@@ -95,7 +95,6 @@ async function setRssFeed(dataFeed, limit) {
     const title = items[i]?.querySelector('title')?.textContent;
     const link = items[i]?.querySelector('link')?.textContent;
     const pubDate = items[i].querySelector("pubDate")?.textContent;
-    console.log(pubDate);
     const descriptionHTML = items[i]?.querySelector('description')?.textContent;
     const $ = cheerio.load(descriptionHTML);
     const description = $.text();
