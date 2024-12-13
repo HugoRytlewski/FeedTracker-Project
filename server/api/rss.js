@@ -33,6 +33,7 @@ export default defineEventHandler(async (event) => {
     
     const data = await response.text();
     
+    
     // Mettre en cache
     cache.set(url, {
       data,
