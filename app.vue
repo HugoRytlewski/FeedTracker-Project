@@ -77,22 +77,30 @@ onMounted(async () => {
 
 async function FeedArticles(fluxRssList) {
   articles.value = [];
-  //contournement cors error par un proxy cors 
-  const proxyUrl = 'https://corsproxy.io/?';
+  waitLoadRss.value = true;
 
-  for (const fluxRss of fluxRssList) {
-    const url = fluxRss.url;
-    try {
-      const reponse = await axios.get(proxyUrl + url);
-      const donnees = reponse.data;
-      setRssFeed(donnees, true);
+  try {
+    for (const fluxRss of fluxRssList) {
+      try {
+        const reponse = await useFetch('/api/rss', {
+          method: 'GET',
+          params: {
+            url: fluxRss.url
+          }
+        });
 
-    } catch (erreur) {
-      console.error(`Une erreur s'est produite lors de la récupération du flux RSS : ${erreur}`);
+        if (reponse.error.value) {
+          throw new Error(reponse.error.value.message);
+        }
+
+        setRssFeed(reponse.data.value, true);
+      } catch (erreur) {
+        console.error(`Erreur pour ${fluxRss.url}:`, erreur);
+      }
     }
-
+  } finally {
+    waitLoadRss.value = false;
   }
-  
 }
 
 

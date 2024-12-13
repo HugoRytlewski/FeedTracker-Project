@@ -7,4 +7,16 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  // Ajout de la configuration Nitro
+  nitro: {
+    routeRules: {
+      '/api/rss': {
+        cors: true,
+        headers: {
+          'Access-Control-Allow-Methods': 'GET',
+          'Access-Control-Allow-Origin': '*',
+        }
+      }
+    }
+  }
 })
