@@ -6,26 +6,58 @@ import Wait from '/components/Layouts/Wait.vue';
 import cheerio from 'cheerio';
 import { useWindowScroll } from "@vueuse/core";
 
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "FeedTracker",
+  "url": "https://feed-beryl.vercel.app",
+  "description": "Votre veille d'informations personnalisée sur la cybersécurité, le développement web et l'actualité tech.",
+  "publisher": {
+    "@type": "Person",
+    "name": "Hugo Rytlewski"
+  }
+};
+
 useHead({
-  title: 'FeedTracker - Hugo Rytlewski',
-  meta: [
-    { charset: 'utf-8' },
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-    { hid: 'description', name: 'description', content: "FeedTracker, votre veille d'informations personnalisée." },
-    { name: 'keywords', content: 'veille, info, informatique, cyber, cybersécurité, développement web, rss, actualités, feedtracker' },
-    { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'https://feed-beryl.vercel.app' },
-    { property: 'og:title', content: 'FeedTracker - Hugo Rytlewski' },
-    { property: 'og:description', content: 'FeedTracker Veille Info' }
-  ],
   htmlAttrs: {
     lang: 'fr'
   },
+  
+  title: 'FeedTracker | Veille Tech & Cybersécurité',
+
+  meta: [
+    { charset: 'utf-8' },
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    
+    { name: 'description', content: "FeedTracker, votre veille d'informations personnalisée. Suivez l'actualité de la cybersécurité, du développement web et de la tech en temps réel." },
+    
+    { name: 'keywords', content: 'veille, info, cybersécurité, développement web, rss, actualités, feedtracker' },
+    
+    { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: 'https://feed-beryl.vercel.app' },
+    { property: 'og:title', content: 'FeedTracker | Veille Tech & Cybersécurité' },
+    { property: 'og:description', content: "Suivez l'actualité de la cybersécurité, du développement web et de la tech en temps réel." },
+    { property: 'og:image', content: 'https://feed-beryl.vercel.app/og-image.png' }, 
+
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:url', content: 'https://feed-beryl.vercel.app' },
+    { name: 'twitter:title', content: 'FeedTracker | Veille Tech & Cybersécurité' },
+    { name: 'twitter:description', content: "Suivez l'actualité de la cybersécurité, du développement web et de la tech en temps réel." },
+    { name: 'twitter:image', content: 'https://feed-beryl.vercel.app/og-image.png' },
+  ],
+
   link: [
     { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+    { rel: 'canonical', href: 'https://feed-beryl.vercel.app' }
   ],
-});
 
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify(structuredData)
+    }
+  ]
+});
 const articles = ref([]);
 const waitLoadRss = ref(true);
 const selectedCategory = ref('Toutes');
