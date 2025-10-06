@@ -1,5 +1,5 @@
-<script setup >
-import { ref, onMounted, computed, watch } from 'vue'; 
+<script setup>
+import { ref, onMounted, computed, watch } from 'vue';
 import Navbar from '/components/Layouts/NavBar.vue';
 import Footer from '/components/Layouts/Footer.vue';
 import Wait from '/components/Layouts/Wait.vue';
@@ -7,127 +7,146 @@ import cheerio from 'cheerio';
 import { useWindowScroll } from "@vueuse/core";
 
 useHead({
-  title: 'FeedTracker -  Hugo Rytlewski',
+  title: 'FeedTracker - Hugo Rytlewski',
   meta: [
     { charset: 'utf-8' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-    { hid: 'description', name: 'description', content: "FeedTracker Veille Info" },
-    { name: 'keywords', content: 'portfolio étudiant, Hugo Rytlewski, développement web, projets de programmation, conception de sites, optimisation SEO, apprentissage en ligne, compétences techniques, HTML, CSS, JavaScript, réalisations académiques, création de sites web, UX/UI, sites responsives, projets interactifs, référencement en ligne, balises meta, stratégies SEO, intégration web, développement frontend, développement backend , veille , info, informatique, cyber, cybersecurite, feedTracker,tracker,feed tracker' },
+    { hid: 'description', name: 'description', content: "FeedTracker, votre veille d'informations personnalisée." },
+    { name: 'keywords', content: 'veille, info, informatique, cyber, cybersécurité, développement web, rss, actualités, feedtracker' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: 'https://feed-beryl.vercel.app' },
+    { property: 'og:title', content: 'FeedTracker - Hugo Rytlewski' },
+    { property: 'og:description', content: 'FeedTracker Veille Info' }
   ],
   link: [
     { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
   ],
-  meta: [
-    { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'https://feed-beryl.vercel.app' },
-    { property: 'og:title', content: 'FeedTracker -  Hugo Rytlewski' },
-    { property: 'og:description', content: 'FeedTracker Veille Info' }
-  ],
-})
+});
 
 const articles = ref([]);
-const limiteArticles = ref(10);
-const { y } = useWindowScroll();
-const waitLoadRss = ref(true)
-
+const waitLoadRss = ref(true);
 const selectedCategory = ref('Toutes');
+const searchQuery = ref('');
+const ARTICLES_PER_PAGE = 12;
+const limiteArticles = ref(ARTICLES_PER_PAGE);
+const { y } = useWindowScroll();
 
-let tableau = [
-  { "id": 3, "url":"https://threatpost.com/feed/", "category": "Cybersécurité" },
-  { "id": 4, "url":"https://krebsonsecurity.com/feed/", "category": "Cybersécurité" },
-  { "id": 5, "url":"https://www.smashingmagazine.com/feed/", "category": "Développement Web" },
-  { "id": 6, "url":"https://cyberveille.curated.co/issues.rss", "category": "Cybersécurité" },
-  { "id": 7, "url":"https://www.rfi.fr/fr/tag/cybercriminalité/rss", "category": "Actualités Cyber" },
-  { "id": 8, "url":"https://www.lemonde.fr/piratage/rss_full.xml", "category": "Actualités Cyber" },
-{ "id": 9, "url": "https://www.cert.ssi.gouv.fr/feed/", "category": "Cybersécurité" },
-  { "id": 10, "url": "https://feeds.feedburner.com/TheHackersNews", "category": "Cybersécurité" },
-  { "id": 11, "url": "https://www.zdnet.fr/feeds/rss/securite/", "category": "Cybersécurité" },
+const fluxRssList = [
+  { "id": 3, "name": "Threatpost", "url":"https://threatpost.com/feed/", "category": "Cybersécurité" },
+  { "id": 4, "name": "Krebs on Security", "url":"https://krebsonsecurity.com/feed/", "category": "Cybersécurité" },
+  { "id": 5, "name": "Smashing Magazine", "url":"https://www.smashingmagazine.com/feed/", "category": "Développement Web" },
+  { "id": 6, "name": "CyberVeiile", "url":"https://cyberveille.curated.co/issues.rss", "category": "Cybersécurité" },
+  { "id": 7, "name": "RFI", "url":"https://www.rfi.fr/fr/tag/cybercriminalité/rss", "category": "Actualités Cyber" },
+  { "id": 8, "name": "Le Monde", "url":"https://www.lemonde.fr/piratage/rss_full.xml", "category": "Actualités Cyber" },
+  { "id": 9, "name": "CERT-FR", "url": "https://www.cert.ssi.gouv.fr/feed/", "category": "Cybersécurité" },
+  { "id": 10, "name": "The Hacker News", "url": "https://feeds.feedburner.com/TheHackersNews", "category": "Cybersécurité" },
+  { "id": 11, "name": "ZDNet Sécurité", "url": "https://www.zdnet.fr/feeds/rss/securite/", "category": "Cybersécurité" },
 ];
 
+const favorites = ref([]);
+const readArticles = ref(new Set());
+const showOnlyUnread = ref(false);
+const layout = ref('grid');
+const currentView = ref('all');
+
+onMounted(() => {
+  favorites.value = JSON.parse(localStorage.getItem('favorites') || '[]');
+  readArticles.value = new Set(JSON.parse(localStorage.getItem('readArticles') || '[]'));
+  layout.value = localStorage.getItem('layout') || 'grid';
+  if (articles.value.length === 0) {
+    fetchAndProcessArticles(fluxRssList);
+  }
+});
+
 const categories = computed(() => {
-  const allCategories = tableau.map(item => item.category);
+  const allCategories = fluxRssList.map(item => item.category);
   return ['Toutes', ...new Set(allCategories)];
 });
 
-onMounted(async () => {
-     FeedArticles(tableau);
+const filteredArticles = computed(() => {
+  let articlesToFilter = currentView.value === 'favorites' ? favorites.value : articles.value;
+  if (selectedCategory.value !== 'Toutes') {
+    articlesToFilter = articlesToFilter.filter(article => article.category === selectedCategory.value);
+  }
+  if (searchQuery.value.trim() !== '') {
+    const lowerCaseQuery = searchQuery.value.toLowerCase();
+    articlesToFilter = articlesToFilter.filter(article =>
+      article.title.toLowerCase().includes(lowerCaseQuery) ||
+      article.description.toLowerCase().includes(lowerCaseQuery)
+    );
+  }
+  if (showOnlyUnread.value) {
+      articlesToFilter = articlesToFilter.filter(article => !readArticles.value.has(article.link));
+  }
+  return articlesToFilter;
 });
 
-async function FeedArticles(fluxRssList) {
+async function fetchAndProcessArticles(feeds) {
   articles.value = [];
   waitLoadRss.value = true;
   try {
-    for (const fluxRss of fluxRssList) {
-      try {
-        const reponse = await useFetch('/api/rss', {
-          method: 'GET',
-          params: { url: fluxRss.url }
-        });
-        if (reponse.error.value) throw new Error(reponse.error.value.message);
-        setRssFeed(reponse.data.value, true, fluxRss.category);
-      } catch (erreur) {
-        console.error(`Erreur pour ${fluxRss.url}:`, erreur);
+    const fetchPromises = feeds.map(feed =>
+      useFetch('/api/rss', { params: { url: feed.url } })
+        .then(({ data, error }) => {
+          if (error.value) return null;
+          return { data: data.value, category: feed.category, sourceName: feed.name };
+        })
+    );
+    const results = await Promise.all(fetchPromises);
+    results.forEach(result => {
+      if (result) {
+        parseAndSetRssFeed(result.data, result.category, result.sourceName);
       }
-    }
+    });
+    articles.value.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
   } finally {
     waitLoadRss.value = false;
   }
 }
 
-function extractImageSource(contentEncoded) {
-  const regex = /<img.*?src="(.*?)"/;
-  const match = regex.exec(contentEncoded);
-  return (match && match[1]) ? match[1] : '';
-}
-
-async function setRssFeed(dataFeed, limit, category) {
-  limiteArticles.value = 10 ;
+async function parseAndSetRssFeed(dataFeed, category, sourceName) {
   const parser = new DOMParser();
   const xml = parser.parseFromString(dataFeed, 'text/xml');
-  const items = xml.getElementsByTagName('item');
-  let limitLength = limit ? 15 : items.length;
-
-  for (let i = 0; i < limitLength; i += 1) {
-    const title = items[i]?.querySelector('title')?.textContent;
-    const link = items[i]?.querySelector('link')?.textContent;
-    const pubDate = items[i].querySelector("pubDate")?.textContent;
-    const descriptionHTML = items[i]?.querySelector('description')?.textContent;
-    const $ = cheerio.load(descriptionHTML);
+  const items = Array.from(xml.getElementsByTagName('item'));
+  for (const item of items.slice(0, 15)) {
+    const title = item.querySelector('title')?.textContent || 'Titre non disponible';
+    const link = item.querySelector('link')?.textContent;
+    if (!link) {
+      continue;
+    }
+    const pubDate = item.querySelector("pubDate")?.textContent;
+    const descriptionHTML = item.querySelector('description')?.textContent;
+    const $ = cheerio.load(descriptionHTML || '');
     const description = $.text();
-    let img = '';
-    const mediaContent = items[i]?.querySelector('media\\:content, content');
-    const mediaThumbnail = items[i]?.querySelector('media\\:thumbnail, thumbnail');
-    if (mediaContent) img = mediaContent.getAttribute('url');
-    else if (mediaThumbnail) img = mediaThumbnail.getAttribute('url');
-    else {
-      const enclosure = items[i]?.querySelector('enclosure');
-      if (enclosure) img = enclosure.getAttribute('url');
-      else {
-        const imgTag = $('img');
-        if (imgTag.length > 0) img = imgTag.attr('src');
-      }
+    let img = extractImage(item, $);
+    if (!await isImageValid(img)) {
+       const contentEncoded = item.getElementsByTagNameNS('*', 'encoded')[0]?.textContent;
+       img = extractImageSourceFromContent(contentEncoded) || '';
     }
-    const isImgValid = await isImageValid(img);
-    if (!isImgValid) {
-      const contentEncoded = items[i]?.getElementsByTagNameNS('*', 'encoded')[0]?.textContent;
-      const imgSrc = extractImageSource(contentEncoded);
-      img = imgSrc || '';
-    }
-    const article = { title, link, description, img, pubDate, category };
-    articles.value.push(article);
-    articles.value.sort(comparerArticles);
+    articles.value.push({ title, link, description, img, pubDate, category, sourceName });
   }
-  waitLoadRss.value = false;
 }
 
-const filteredArticles = computed(() => {
-  if (selectedCategory.value === 'Toutes') {
-    return articles.value;
-  }
-  return articles.value.filter(article => article.category === selectedCategory.value);
-});
+function extractImage(item, cheerioInstance) {
+    const mediaContent = item.querySelector('media\\:content, content');
+    if (mediaContent) return mediaContent.getAttribute('url');
+    const mediaThumbnail = item.querySelector('media\\:thumbnail, thumbnail');
+    if (mediaThumbnail) return mediaThumbnail.getAttribute('url');
+    const enclosure = item.querySelector('enclosure');
+    if (enclosure && enclosure.getAttribute('type').startsWith('image')) return enclosure.getAttribute('url');
+    const imgTag = cheerioInstance('img');
+    if (imgTag.length > 0) return imgTag.attr('src');
+    return '';
+}
+
+function extractImageSourceFromContent(content) {
+  if (!content) return '';
+  const match = /<img.*?src="(.*?)"/.exec(content);
+  return match?.[1] || '';
+}
 
 async function isImageValid(url) {
+  if (!url) return false;
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => resolve(true);
@@ -137,80 +156,148 @@ async function isImageValid(url) {
 }
 
 function incrementlimiteArticles() {
-  limiteArticles.value += 10;
+  limiteArticles.value += ARTICLES_PER_PAGE;
 }
 
-function ScrollTop() {
-  window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+function scrollTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function comparerArticles(a, b) {
-  const dateA = new Date(a.pubDate);
-  const dateB = new Date(b.pubDate);
-  return dateB - dateA;
+function toggleFavorite(article) {
+  const index = favorites.value.findIndex(fav => fav.link === article.link);
+  if (index === -1) {
+    favorites.value.push(article);
+  } else {
+    favorites.value.splice(index, 1);
+  }
+  localStorage.setItem('favorites', JSON.stringify(favorites.value));
 }
 
-watch(selectedCategory, () => {
-  limiteArticles.value = 10; 
-  ScrollTop(); 
+function isFavorite(article) {
+  return favorites.value.some(fav => fav.link === article.link);
+}
+
+function markAsRead(link) {
+  readArticles.value.add(link);
+  localStorage.setItem('readArticles', JSON.stringify(Array.from(readArticles.value)));
+}
+
+function setLayout(newLayout) {
+  layout.value = newLayout;
+  localStorage.setItem('layout', newLayout);
+}
+
+function setView(view) {
+    currentView.value = view;
+    selectedCategory.value = 'Toutes';
+    searchQuery.value = '';
+}
+
+watch([selectedCategory, searchQuery, showOnlyUnread, currentView], () => {
+  limiteArticles.value = ARTICLES_PER_PAGE;
+  scrollTop();
 });
-
 </script>
 
 <template>
-    <Wait class="hidden md:grid" v-if="waitLoadRss"/>
-    <Navbar/>
-    <div class="p-10 mt-24 lg:p-28 lg:mt-16" id="accueil">
+  <Wait class="hidden md:grid" v-if="waitLoadRss"/>
+  <Navbar/>
+  <main class="p-6 md:p-10 lg:px-24 mt-24" id="accueil">
 
-    <div class="flex items-center justify-center gap-4 mb-12">
-        <label for="category-select" class="text-white font-semibold">Trier par catégorie :</label>
-        <select 
-            id="category-select"
-            v-model="selectedCategory"
-            class="bg-neutral-700 text-white p-2 rounded-md border-neutral-600 focus:ring-2 focus:ring-white focus:outline-none cursor-pointer"
-        >
-            <option v-for="category in categories" :key="category" :value="category">
-                {{ category }}
-            </option>
-        </select>
+    <div class="flex justify-center border-b border-neutral-800 mb-8">
+        <button @click="setView('all')" :class="currentView === 'all' ? 'border-sky-500 text-white' : 'border-transparent text-neutral-400 hover:text-white'" class="px-4 py-2 font-semibold border-b-2 transition-colors duration-300">
+            Tous les articles
+        </button>
+        <button @click="setView('favorites')" :class="currentView === 'favorites' ? 'border-sky-500 text-white' : 'border-transparent text-neutral-400 hover:text-white'" class="px-4 py-2 font-semibold border-b-2 transition-colors duration-300">
+            Mes favoris ({{ favorites.length }})
+        </button>
     </div>
 
-    <div class="grid lg:grid-cols-2 gap-16">
-      <div v-for="(article, index) in filteredArticles.slice(0, limiteArticles)" :key="index" class="flex h-full items-center justify-center flex-col gap-6 rounded-xl bg-neutral-800 md:hover:-translate-y-1 md:hover:scale-105 md:duration-200 p-6 border-neutral-800 shadow-md">
-        <img v-if="article.img" :src="article.img" class="pixelated-image w-11/12 max-h-72 rounded-lg object-cover lazyload">
-        <img v-else src="~/assets/img/ee.png" class="w-11/12 max-h-72 rounded-lg object-cover">
-        <div class="flex flex-col justify-between w-full gap-y-4">
-          <div class="space-y-4">
-            <div class="flex justify-center">
-              <p class="line-clamp-2 md:line-clamp-1 text-lg max-w-fit text-white text-center font-bold">
-                {{ article.title }}
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-10 p-4 bg-neutral-900/50 rounded-lg border border-neutral-800">
+      <div class="flex flex-col sm:flex-row items-center gap-4 w-full">
+        <input type="text" v-model="searchQuery" placeholder="Rechercher..." class="bg-neutral-800 text-white px-4 py-2 rounded-md w-full sm:w-60 border border-neutral-700 focus:ring-2 focus:ring-sky-500 focus:outline-none transition"/>
+        <select v-if="currentView === 'all'" v-model="selectedCategory" class="bg-neutral-800 text-white px-4 py-2 rounded-md w-full sm:w-auto border border-neutral-700 focus:ring-2 focus:ring-sky-500 focus:outline-none transition cursor-pointer">
+            <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
+        </select>
+         <label for="show-unread" class="flex items-center gap-2 text-neutral-300 cursor-pointer select-none hover:text-white transition">
+            <input type="checkbox" id="show-unread" v-model="showOnlyUnread" class="w-4 h-4 text-sky-600 bg-neutral-700 border-neutral-600 rounded focus:ring-sky-500 cursor-pointer">
+            Masquer les lus
+        </label>
+      </div>
+
+      <div class="flex items-center gap-1 p-1 bg-neutral-800 rounded-md border border-neutral-700">
+          <button @click="setLayout('grid')" :class="layout === 'grid' ? 'bg-sky-600 text-white' : 'text-neutral-400 hover:bg-neutral-700'" class="p-1.5 rounded transition-colors">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+          </button>
+          <button @click="setLayout('list')" :class="layout === 'list' ? 'bg-sky-600 text-white' : 'text-neutral-400 hover:bg-neutral-700'" class="p-1.5 rounded transition-colors">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          </button>
+      </div>
+    </div>
+    
+    <div v-if="!waitLoadRss && filteredArticles.length > 0" :class="layout === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8' : 'flex flex-col gap-4'">
+      <div v-for="(article, index) in filteredArticles.slice(0, limiteArticles)" :key="article.link + index" class="group">
+          
+          <div v-if="layout === 'grid'" :class="readArticles.has(article.link) ? 'opacity-70 group-hover:opacity-100' : ''" class="relative flex flex-col h-full bg-neutral-900 rounded-lg overflow-hidden border border-neutral-800 transition-all duration-300 hover:border-sky-500/40 hover:-translate-y-1">
+            <a :href="article.link" @click="markAsRead(article.link)" target="_blank" rel="noopener noreferrer" class="block">
+              <img v-if="article.img" :src="article.img" class="w-full aspect-video object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+              <div v-else class="w-full aspect-video bg-neutral-800 flex items-center justify-center">
+                <span class="text-neutral-600 text-xs">Image indisponible</span>
+              </div>
+            </a>
+            <div class="p-5 flex flex-col flex-grow">
+              <div class="flex justify-between items-center text-xs text-neutral-400 mb-2">
+                  <span class="font-bold uppercase tracking-wider">{{ article.sourceName }}</span>
+                  <span v-if="article.pubDate">{{ new Date(article.pubDate).toLocaleDateString('fr-FR') }}</span>
+              </div>
+              <h3 class="text-md font-bold text-neutral-100 line-clamp-2 mb-2 flex-grow">
+                <a :href="article.link" @click="markAsRead(article.link)" target="_blank" rel="noopener noreferrer" class="hover:text-sky-400 transition-colors">
+                  {{ article.title }}
+                </a>
+              </h3>
+              <p class="text-sm text-neutral-400 line-clamp-3 mb-4">
+                {{ article.description }}
               </p>
             </div>
-            <p class="line-clamp-3 text-white text-center">
-              {{ article.description }}
-            </p>
-            <div class="flex justify-center">                            
-              <a :href="article.link" target="_blank" class="float-right rounded-lg bg-neutral-200 px-2 py-1 text-sm transition hover:bg-neutral-400">
-                Lire la suite
-              </a>
-            </div>
+            <button @click="toggleFavorite(article)" title="Ajouter aux favoris" class="absolute top-3 right-3 p-2 rounded-full bg-black/40 hover:bg-black/60 transition-colors z-10">
+              <svg class="w-5 h-5 transition-colors" :class="isFavorite(article) ? 'text-yellow-400' : 'text-white'" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+            </button>
           </div>
-        </div>
+          
+          <div v-if="layout === 'list'" :class="readArticles.has(article.link) ? 'opacity-60' : ''" class="flex items-center justify-between p-4 bg-neutral-900 rounded-lg hover:bg-neutral-800/60 border border-neutral-800 hover:border-neutral-700 transition-all duration-300">
+              <div class="flex-1 min-w-0 pr-4">
+                  <a :href="article.link" @click="markAsRead(article.link)" target="_blank" rel="noopener noreferrer" class="block">
+                    <p class="text-neutral-100 font-semibold truncate">{{ article.title }}</p>
+                    <p class="text-xs text-neutral-500 mt-1">{{ article.sourceName }} - {{ new Date(article.pubDate).toLocaleDateString('fr-FR') }}</p>
+                  </a>
+              </div>
+              <div class="flex items-center gap-4 flex-shrink-0">
+                  <button @click="toggleFavorite(article)" title="Ajouter aux favoris" class="p-1">
+                      <svg class="w-5 h-5 transition-colors" :class="isFavorite(article) ? 'text-yellow-400' : 'text-neutral-600 hover:text-yellow-400'" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                  </button>
+                  <a :href="article.link" @click="markAsRead(article.link)" target="_blank" rel="noopener noreferrer" class="rounded-md bg-neutral-700 px-3 py-1 text-sm text-neutral-200 transition hover:bg-sky-600 hover:text-white">
+                    Lire
+                  </a>
+              </div>
+          </div>
       </div>
     </div>
 
+    <div v-if="!waitLoadRss && filteredArticles.length === 0" class="text-center text-neutral-500 py-16">
+        <p class="text-2xl font-semibold text-neutral-200">Aucun article trouvé.</p>
+        <p class="text-md mt-2">Essayez de modifier vos filtres ou de consulter vos favoris.</p>
+    </div>
+
     <div class="flex items-center justify-center mt-16">
-      <button v-if="limiteArticles < filteredArticles.length" @click="incrementlimiteArticles" class="relative rounded px-5 py-2.5 text-black overflow-hidden group bg-white md:hover:bg-neutral-400">
-        <span class="absolute right-0 w-8 h-32 -mt-12"></span>
-        <span class="relative">Voir plus</span>
+      <button v-if="!waitLoadRss && limiteArticles < filteredArticles.length" @click="incrementlimiteArticles" class="px-6 py-2.5 font-semibold text-white bg-sky-600 rounded-lg hover:bg-sky-700 transition-colors duration-300">
+        Voir plus
       </button>
     </div>
-  </div>
-  <Transition>
-    <button v-if="y>100" @click="ScrollTop()" class="text-black bg-white fixed bottom-0 right-0 p-3 mr-4 mb-4 rounded-full">
-      <svg class="w-4 h-4 text-white-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
-      </svg>
+  </main>
+
+  <Transition name="fade">
+    <button v-if="y > 200" @click="scrollTop()" class="text-white bg-sky-600 fixed bottom-0 right-0 p-3 m-4 rounded-full shadow-lg hover:bg-sky-700 transition-colors duration-300">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
     </button>
   </Transition>
   <Footer/>
@@ -221,19 +308,20 @@ html {
   scroll-behavior: smooth;
 }
 body {
-  background-color: rgb(27, 27, 27);
+  background-color: #171717;
+  color: #e5e5e5;
 }
-.v-enter-active,
-.v-leave-active {
-  transition: all 0.5s ease;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
 }
-
-.v-enter-from,
-.v-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
-  transform: translateY(-100%);
 }
 .pixelated-image {
-  image-rendering: pixelated; /* Applique un rendu pixelisé */
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 </style>
